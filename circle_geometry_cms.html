@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>வட்டத் தேற்றங்கள் - Circle Geometry Explorer</title>
+    <!-- Tailwind CSS for modern responsive design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta+Malar:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Mukta Malar', sans-serif;
+            touch-action: none;
+            overscroll-behavior: none;
+        }
+        canvas {
+            touch-action: none;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="bg-slate-900 border-b border-slate-800 shadow-md sticky top-0 z-30 px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center space-x-2.5">
+            <div class="bg-gradient-to-tr from-indigo-600 to-violet-500 text-white p-2 rounded-xl shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="12" cy="12" r="9" stroke-width="2.5"/>
+                    <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-base sm:text-lg font-bold text-white tracking-wide leading-tight">வட்டத் தேற்றங்கள்</h1>
+                <p class="text-[11px] text-slate-400">அனைத்துப் புள்ளிகளையும் நகர்த்தலாம்</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="toggleCoordinates()" id="coord-toggle-btn" class="text-xs bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 font-medium px-2.5 py-1.5 rounded-lg border border-slate-700 transition flex items-center space-x-1 shadow-sm" title="ஆள்கூறுகளைக் காட்டு/மறை">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                <span class="hidden sm:inline">ஆள்கூறுகள்</span>
+            </button>
+            <button onclick="resetCurrentTheorem()" class="text-xs bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 font-medium px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center space-x-1 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <span>மீட்டமை</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Theorem Selector Tabs -->
+    <nav class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-3 py-2 overflow-x-auto no-scrollbar sticky top-[57px] z-20">
+        <div class="flex space-x-2 min-w-max" id="theorem-tabs">
+            <button onclick="switchTheorem(0)" id="tab-0" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition bg-indigo-600 text-white shadow-md flex items-center space-x-1.5">
+                <span>1. மையக்கோணம் (2x)</span>
+            </button>
+            <button onclick="switchTheorem(1)" id="tab-1" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center space-x-1.5">
+                <span>2. ஒரே துண்டக் கோணம்</span>
+            </button>
+            <button onclick="switchTheorem(2)" id="tab-2" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center space-x-1.5">
+                <span>3. அரைவட்டக்கோணம் (90°)</span>
+            </button>
+            <button onclick="switchTheorem(3)" id="tab-3" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center space-x-1.5">
+                <span>4. வட்ட நாற்பக்கல் (180°)</span>
+            </button>
+            <button onclick="switchTheorem(4)" id="tab-4" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center space-x-1.5">
+                <span>5. புறக்கோணம்</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-1 flex flex-col max-w-4xl mx-auto w-full p-3 sm:p-4 gap-3 my-auto">
+
+        <!-- Info & Explanation Card -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-lg relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-bl-full pointer-events-none"></div>
+            <h2 id="theorem-title" class="text-sm sm:text-base font-bold text-indigo-400 mb-1">மையக்கோணம் பரிதிக்கோணத்தின் இருமடங்கு</h2>
+            <p id="theorem-desc" class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-2.5">
+                ஒரு வட்டத்தின் வில்லால மையத்தில் தாங்கப்படும் கோணம், அவ்வில்லால மீதிப் பரிதியில் தாங்கப்படும் கோணத்தின் இரண்டு மடங்காகும்.
+            </p>
+            <div class="flex items-center space-x-2 text-[11px] text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1.5 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span id="instruction-text">அனைத்து நீல நிறப் புள்ளிகளையும் (A, B, P போன்றவை) விரலால் அல்லது மவுஸால் சுதந்திரமாக இழுத்து மாற்றலாம்.</span>
+            </div>
+        </section>
+
+        <!-- Canvas Interactive Stage -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl flex flex-col overflow-hidden relative flex-1 min-h-[380px] sm:min-h-[440px]">
+            <div class="flex-1 relative flex items-center justify-center p-2">
+                <canvas id="geoCanvas" class="w-full h-full max-w-[500px] max-h-[500px] cursor-crosshair rounded-xl bg-slate-950/65 shadow-inner"></canvas>
+            </div>
+
+            <!-- Real-time Verification Badge / Bottom Bar -->
+            <div class="bg-slate-950/90 border-t border-slate-800/80 px-4 py-3 flex flex-wrap justify-between items-center text-xs sm:text-sm font-mono gap-2" id="verification-banner">
+                <!-- Dynamically updated verification stats -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-3 text-[11px] text-slate-500 border-t border-slate-900">
+        வட்டத் தேற்றங்கள் ஊடாடும் கற்பித்தல் கருவி &copy; 2026
+    </footer>
+
+    <!-- JavaScript Application Logic with Fully Adjustable Points -->
+    <script>
+        const canvas = document.getElementById('geoCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let currentTheorem = 0;
+        let width = 500;
+        let height = 500;
+        let center = { x: 250, y: 250 };
+        let radius = 160;
+        let showCoords = false;
+
+        let points = {};
+        let activePointKey = null;
+
+        const theoremsData = [
+            {
+                title: "1. மையக்கோணம் பரிதிக்கோணத்தின் இருமடங்கு",
+                desc: "மையக்கோணம் (Central Angle) எப்போதும் பரிதிக்கோணத்தின் (Circumference Angle) இருமடங்காகும் (2x).",
+                instruction: "புள்ளிகள் A, B, மற்றும் P ஆகிய அனைத்தையும் வட்டத்தில் எங்கு வேண்டுமானாலும் இழுத்துச் சோதிக்கலாம்."
+            },
+            {
+                title: "2. ஒரே துண்டக் கோணங்கள் சமன்",
+                desc: "ஒரே வட்டவிலால் வட்டத்தின் ஒரே துண்டத்தில் தாங்கப்படும் கோணங்கள் அனைத்தும் ஒன்றுக்கொன்று சமனாகும்.",
+                instruction: "A, B, C, D ஆகிய நான்கு புள்ளிகளையும் சுதந்திரமாக மாற்றி கோணங்கள் சமமாக இருப்பதை அவதானிக்கவும்."
+            },
+            {
+                title: "3. அரைவட்டக்கோணம் செங்கோணம் (90°)",
+                desc: "அரைவட்டத்திலுள்ள கோணம் எப்போதும் செங்கோணமாகும் (90 பாகை). விட்டத்தின் முனைகள் A, B மற்றும் பரிதிப் புள்ளி P.",
+                instruction: "விட்ட முனைகள் A, B மற்றும் பரிதிப் புள்ளி P ஐ நகர்த்திச் சோதிக்கவும்."
+            },
+            {
+                title: "4. வட்ட நாற்பக்கல் எதிர்க்கோணங்கள்",
+                desc: "வட்ட நாற்பக்கலின் எதிர் உச்சிப் புள்ளிகளின் கோணங்களின் கூட்டுத்தொகை எப்போதும் 180° ஆகும் (Supplementary).",
+                instruction: "A, B, C, D ஆகிய நான்கு உச்சிப் புள்ளிகளையும் இழுத்து எதிர்க்கோணங்களின் கூட்டுத்தொகை 180° என்பதைச் சரிபார்க்க."
+            },
+            {
+                title: "5. வட்ட நாற்பக்கல் புறக்கோணம்",
+                desc: "வட்ட நாற்பக்கலின் ஒரு பக்கத்தை நீட்டும் போது உருவாகும் புறக்கோணம், அதன் அகத்து எதிர்க்கோணத்திற்குச் சமன்.",
+                instruction: "A, B, C, D புள்ளிகளை நகர்த்திப் புறக்கோணமும் அகத்து எதிர்க்கோணமும் சமமாதைக் காண்க."
+            }
+        ];
+
+        function resizeAndInit() {
+            const container = canvas.parentElement;
+            const displayWidth = container.clientWidth || 400;
+            const displayHeight = container.clientHeight || 400;
+            
+            width = displayWidth;
+            height = displayHeight;
+            canvas.width = width;
+            canvas.height = height;
+
+            center = { x: width / 2, y: height / 2 };
+            radius = Math.min(width, height) * 0.38;
+
+            initPoints();
+            draw();
+        }
+
+        function initPoints() {
+            if (currentTheorem === 0) {
+                // Theorem 1: A, B, P are all adjustable on circumference
+                points = {
+                    A: { x: center.x - radius * 0.8, y: center.y + radius * 0.6, draggable: true, label: "A", onCircle: true },
+                    B: { x: center.x + radius * 0.8, y: center.y + radius * 0.6, draggable: true, label: "B", onCircle: true },
+                    P: { x: center.x, y: center.y - radius, draggable: true, label: "P", onCircle: true }
+                };
+            } else if (currentTheorem === 1) {
+                // Theorem 2: A, B, C, D are all adjustable on circumference
+                points = {
+                    A: { x: center.x - radius * 0.7, y: center.y + radius * 0.5, draggable: true, label: "A", onCircle: true },
+                    B: { x: center.x + radius * 0.7, y: center.y + radius * 0.5, draggable: true, label: "B", onCircle: true },
+                    C: { x: center.x - radius * 0.3, y: center.y - radius * 0.9, draggable: true, label: "C", onCircle: true },
+                    D: { x: center.x + radius * 0.4, y: center.y - radius * 0.85, draggable: true, label: "D", onCircle: true }
+                };
+            } else if (currentTheorem === 2) {
+                // Theorem 3: Diameter endpoints A, B and point P are all adjustable on circle
+                points = {
+                    A: { x: center.x - radius, y: center.y, draggable: true, label: "A", onCircle: true },
+                    B: { x: center.x + radius, y: center.y, draggable: true, label: "B", onCircle: true },
+                    P: { x: center.x + radius * 0.5, y: center.y - radius * 0.86, draggable: true, label: "P", onCircle: true }
+                };
+            } else if (currentTheorem === 3 || currentTheorem === 4) {
+                // Theorem 4 & 5: Cyclic Quad A, B, C, D all adjustable on circle
+                points = {
+                    A: { x: center.x - radius * 0.7, y: center.y - radius * 0.7, draggable: true, label: "A", onCircle: true },
+                    B: { x: center.x - radius * 0.8, y: center.y + radius * 0.5, draggable: true, label: "B", onCircle: true },
+                    C: { x: center.x + radius * 0.6, y: center.y + radius * 0.7, draggable: true, label: "C", onCircle: true },
+                    D: { x: center.x + radius * 0.7, y: center.y - radius * 0.5, draggable: true, label: "D", onCircle: true }
+                };
+            }
+        }
+
+        window.addEventListener('resize', resizeAndInit);
+
+        function switchTheorem(index) {
+            currentTheorem = index;
+            for (let i = 0; i < 5; i++) {
+                const btn = document.getElementById(`tab-${i}`);
+                if (i === index) {
+                    btn.className = "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition bg-indigo-600 text-white shadow-md flex items-center space-x-1.5";
+                } else {
+                    btn.className = "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center space-x-1.5";
+                }
+            }
+
+            document.getElementById('theorem-title').innerText = theoremsData[index].title;
+            document.getElementById('theorem-desc').innerText = theoremsData[index].desc;
+            document.getElementById('instruction-text').innerText = theoremsData[index].instruction;
+
+            initPoints();
+            draw();
+        }
+
+        function resetCurrentTheorem() {
+            initPoints();
+            draw();
+        }
+
+        function toggleCoordinates() {
+            showCoords = !showCoords;
+            const btn = document.getElementById('coord-toggle-btn');
+            if (showCoords) {
+                btn.className = "text-xs bg-indigo-600 text-white font-medium px-2.5 py-1.5 rounded-lg border border-indigo-500 transition flex items-center space-x-1 shadow-sm";
+            } else {
+                btn.className = "text-xs bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 font-medium px-2.5 py-1.5 rounded-lg border border-slate-700 transition flex items-center space-x-1 shadow-sm";
+            }
+            draw();
+        }
+
+        function getAngle(p1, p2, p3) {
+            const v1 = { x: p1.x - p2.x, y: p1.y - p2.y };
+            const v2 = { x: p3.x - p2.x, y: p3.y - p2.y };
+            const dot = v1.x * v2.x + v1.y * v2.y;
+            const mag1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y);
+            const mag2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y);
+            if (mag1 === 0 || mag2 === 0) return 0;
+            let rad = Math.acos(Math.max(-1, Math.min(1, dot / (mag1 * mag2))));
+            return (rad * 180) / Math.PI;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Circle outline
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Center O marker
+            ctx.fillStyle = '#64748b';
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = '11px Inter';
+            ctx.fillText('O', center.x + 6, center.y - 6);
+
+            if (currentTheorem === 0) renderTheorem0();
+            else if (currentTheorem === 1) renderTheorem1();
+            else if (currentTheorem === 2) renderTheorem2();
+            else if (currentTheorem === 3) renderTheorem3();
+            else if (currentTheorem === 4) renderTheorem4();
+
+            // Draw points
+            for (let key in points) {
+                const pt = points[key];
+                
+                if (pt.draggable) {
+                    ctx.beginPath();
+                    ctx.arc(pt.x, pt.y, 18, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(56, 189, 248, 0.2)';
+                    ctx.fill();
+                }
+
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, pt.draggable ? 10 : 5, 0, Math.PI * 2);
+                ctx.fillStyle = pt.draggable ? '#38bdf8' : '#cbd5e1';
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#020617';
+                ctx.stroke();
+
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = 'bold 12px Inter';
+                
+                let labelText = pt.label;
+                if (showCoords) {
+                    const relX = Math.round(pt.x - center.x);
+                    const relY = Math.round(center.y - pt.y);
+                    labelText += ` (${relX}, ${relY})`;
+                }
+                ctx.fillText(labelText, pt.x + 12, pt.y - 6);
+            }
+        }
+
+        function renderTheorem0() {
+            const { A, B, P } = points;
+            ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(P.x, P.y); ctx.lineTo(A.x, A.y); ctx.moveTo(P.x, P.y); ctx.lineTo(B.x, B.y); ctx.stroke();
+
+            ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(center.x, center.y); ctx.lineTo(A.x, A.y); ctx.moveTo(center.x, center.y); ctx.lineTo(B.x, B.y); ctx.stroke();
+
+            const circ = getAngle(A, P, B);
+            const central = getAngle(A, center, B);
+
+            document.getElementById('verification-banner').innerHTML = `
+                <span class="text-sky-400">பரிதி: <b>${circ.toFixed(1)}°</b></span>
+                <span class="text-rose-400">மையம்: <b>${central.toFixed(1)}°</b></span>
+                <span class="text-emerald-400">விகிதம்: <b>${(central / (circ || 1)).toFixed(2)}x</b></span>
+            `;
+        }
+
+        function renderTheorem1() {
+            const { A, B, C, D } = points;
+            ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.stroke();
+
+            ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(C.x, C.y); ctx.lineTo(A.x, A.y); ctx.moveTo(C.x, C.y); ctx.lineTo(B.x, B.y); ctx.stroke();
+
+            ctx.strokeStyle = '#a855f7'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(D.x, D.y); ctx.lineTo(A.x, A.y); ctx.moveTo(D.x, D.y); ctx.lineTo(B.x, B.y); ctx.stroke();
+
+            const angleC = getAngle(A, C, B);
+            const angleD = getAngle(A, D, B);
+
+            document.getElementById('verification-banner').innerHTML = `
+                <span class="text-sky-400">ACB = <b>${angleC.toFixed(1)}°</b></span>
+                <span class="text-purple-400">ADB = <b>${angleD.toFixed(1)}°</b></span>
+                <span class="text-emerald-400">சமம் ✔</span>
+            `;
+        }
+
+        function renderTheorem2() {
+            const { A, B, P } = points;
+            ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.stroke();
+
+            ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(P.x, P.y); ctx.lineTo(A.x, A.y); ctx.moveTo(P.x, P.y); ctx.lineTo(B.x, B.y); ctx.stroke();
+
+            const angleP = getAngle(A, P, B);
+
+            document.getElementById('verification-banner').innerHTML = `
+                <span class="text-emerald-400">அரைவட்டக்கோணம் (APB): <b>${angleP.toFixed(1)}°</b> (செங்கோணம்)</span>
+            `;
+        }
+
+        function renderTheorem3() {
+            const { A, B, C, D } = points;
+            ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.lineTo(C.x, C.y); ctx.lineTo(D.x, D.y); ctx.closePath();
+            ctx.stroke();
+
+            const angleA = getAngle(D, A, B);
+            const angleC = getAngle(B, C, D);
+            const sumAC = angleA + angleC;
+
+            document.getElementById('verification-banner').innerHTML = `
+                <span class="text-sky-400">A = <b>${angleA.toFixed(1)}°</b></span>
+                <span class="text-purple-400">C = <b>${angleC.toFixed(1)}°</b></span>
+                <span class="text-emerald-400">கூட்டுத்தொகை A+C = <b>${sumAC.toFixed(1)}°</b></span>
+            `;
+        }
+
+        function renderTheorem4() {
+            const { A, B, C, D } = points;
+            ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.lineTo(C.x, C.y); ctx.lineTo(D.x, D.y); ctx.closePath();
+            ctx.stroke();
+
+            const extLength = 70;
+            const dx = C.x - D.x;
+            const dy = C.y - D.y;
+            const len = Math.hypot(dx, dy) || 1;
+            const E = { x: C.x + (dx / len) * extLength, y: C.y + (dy / len) * extLength };
+
+            ctx.strokeStyle = '#f43f5e'; ctx.setLineDash([3, 3]);
+            ctx.beginPath(); ctx.moveTo(C.x, C.y); ctx.lineTo(E.x, E.y); ctx.stroke();
+            ctx.setLineDash([]);
+
+            const extAngle = getAngle(B, C, E);
+            const intOppAngle = getAngle(D, A, B);
+
+            document.getElementById('verification-banner').innerHTML = `
+                <span class="text-rose-400">புறக்கோணம்: <b>${extAngle.toFixed(1)}°</b></span>
+                <span class="text-emerald-400">அகத்து எதிர்க்கோணம்: <b>${intOppAngle.toFixed(1)}°</b></span>
+            `;
+        }
+
+        // Flawless Canvas Coordinate Mapping for Touch and Mouse Events
+        function getCanvasPoint(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+            const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+            
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        function handleStart(e) {
+            const pos = getCanvasPoint(e);
+            let closestKey = null;
+            let minDistance = 55; // generous touch hit radius
+
+            for (let key in points) {
+                const pt = points[key];
+                if (pt.draggable) {
+                    const dist = Math.hypot(pt.x - pos.x, pt.y - pos.y);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        closestKey = key;
+                    }
+                }
+            }
+
+            if (closestKey) {
+                activePointKey = closestKey;
+                if (e.pointerId !== undefined && canvas.setPointerCapture) {
+                    try { canvas.setPointerCapture(e.pointerId); } catch(err) {}
+                }
+                e.preventDefault();
+            }
+        }
+
+        function handleMove(e) {
+            if (!activePointKey) return;
+            const pos = getCanvasPoint(e);
+            const angle = Math.atan2(pos.y - center.y, pos.x - center.x);
+
+            const pt = points[activePointKey];
+            if (pt.onCircle) {
+                // Snap and constrain precisely to the circle circumference
+                pt.x = center.x + radius * Math.cos(angle);
+                pt.y = center.y + radius * Math.sin(angle);
+            } else {
+                const distFromCenter = Math.hypot(pos.x - center.x, pos.y - center.y);
+                const clampedDist = Math.max(radius * 0.2, Math.min(distFromCenter, radius * 1.15));
+                pt.x = center.x + clampedDist * Math.cos(angle);
+                pt.y = center.y + clampedDist * Math.sin(angle);
+            }
+            draw();
+            e.preventDefault();
+        }
+
+        function handleEnd(e) {
+            if (activePointKey) {
+                if (e.pointerId !== undefined && canvas.releasePointerCapture) {
+                    try { canvas.releasePointerCapture(e.pointerId); } catch(err) {}
+                }
+                activePointKey = null;
+            }
+        }
+
+        canvas.addEventListener('pointerdown', handleStart);
+        canvas.addEventListener('pointermove', handleMove);
+        canvas.addEventListener('pointerup', handleEnd);
+        canvas.addEventListener('pointercancel', handleEnd);
+
+        canvas.addEventListener('touchstart', handleStart, { passive: false });
+        canvas.addEventListener('touchmove', handleMove, { passive: false });
+        canvas.addEventListener('touchend', handleEnd);
+
+        window.onload = function() {
+            resizeAndInit();
+        };
+    </script>
+</body>
+</html>
